@@ -16,4 +16,7 @@ const reset = document.getElementById('reset');
 const dotNumpad = document.getElementsByClassName('numpad dot');
 const plusoumoins = document.getElementById('plusoumoins');
 
-console.log(resetButton);
+// add style    
+calcul.style.maxWidth = "400px";
+calcul.style.margin = "auto";
+console.log(calcul.style);
