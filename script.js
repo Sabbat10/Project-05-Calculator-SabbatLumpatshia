@@ -4,204 +4,70 @@
 
 // seclect elements 
 // Sélectionner tous les boutons numériques et leur ajouter un écouteur d'événement
-import {
-    calculate
-  } from './calculator.js';
-  
-  // // TODO: Faire la manipulation du DOM dans ce fichier
-  
-  const form = document.querySelector("form");
-  const userInput = form.elements["userInput"];
+const digitButtons = document.querySelectorAll(".numpad.digit");
+digitButtons.forEach((button) => {
+  button.addEventListener("click", myDigit);
+});
 
-  const display1Element = document.querySelector('#calcul');
-  const display2Element = document.querySelector('#input');
+// Sélectionner tous les boutons d'opérateur et leur ajouter un écouteur d'événement
+const operatorButtons = document.querySelectorAll("#plus, #minus, #times, #divideby");
+operatorButtons.forEach((button) => {
+  button.addEventListener("click", toLabel);s
+});
 
-  const numberEl = document.querySelectorAll('.numpad');
-  const operationEL = document.querySelectorAll('#divideby, #times, #minus, #plus');
+// Sélectionner le bouton "C" (clear) et lui ajouter un écouteur d'événement
+const clearButton = document.getElementById("clear");
+clearButton.addEventListener("click", clearInput);
 
-  const equalEl = document.querySelector('#equals');
-  const clearEl = document.querySelector('#reset');
+// Sélectionner le bouton "AC" (reset) et lui ajouter un écouteur d'événement
+const resetButton = document.getElementById("reset");
+resetButton.addEventListener("click", reset);
 
-  const clearLastEl = document.querySelector('#clear');
-  const pourcentage = document.querySelector('#percentage')
+// Sélectionner le bouton "+/-" (changeSign) et lui ajouter un écouteur d'événement
+const plusoumoins = document.getElementById("plusoumoins");
+plusoumoins.addEventListener('click', changeSign);
 
-  const plusoumoins = document.querySelector('#plusoumoins');
-  
-  display2Element.setAttribute('readonly', 'readonly');
-  
-  
-  let dis1Num = '';
-  let dis2Num = '';
-  display2Element.value = '';
-  let result = null;
-  let lastOperation = '';
-  let haveDot = false;
-  
-  
-  // selection 
-  numberEl.forEach(number => {
-    number.addEventListener('click', (e) => {
-      if (e.target.innerText === '.' && !haveDot) {
-        haveDot = true;
-      } else if (e.target.innerText === '.' && haveDot) {
-        return;
-      }
-      if (display2Element.value.length < 10) {
-        dis2Num += e.target.innerText;
-        display2Element.value = dis2Num;
-        if (display2Element.value == 0) {
-          if (display2Element.value == '00') {
-            dis2Num = '';
-            display2Element.value = eval('0');
-          }
-        }
-      }
-    })
-  });
-  
-  // selection des opérator
-  operationEL.forEach(operation => {
-    operation.addEventListener('click', (e) => {
-      if (!dis2Num) return;
-      haveDot = false;
-      const operationName = e.target.innerText;
-      if (dis1Num && dis2Num && lastOperation) {
-        mathOperation();
-      } else {
-        result = parseFloat(dis2Num);
-      }
-      clearVar(operationName);
-      lastOperation = operationName;
-    })
-  });
-  
-  // 
-  function clearVar(name = '') {
-    dis1Num += dis2Num + ' ' + name + ' ';
-    display1Element.innerText = dis1Num;
-    display2Element.value = '';
-    dis2Num = '';
-  }
-  
-  // 
-  function mathOperation() {
-    if (lastOperation === '×') {
-      result = parseFloat(result) * parseFloat(dis2Num);
-    }
-    else if (lastOperation === '+') {
-      result = parseFloat(result) + parseFloat(dis2Num);
-    }
-    else if (lastOperation === '-') {
-      result = parseFloat(result) - parseFloat(dis2Num);
-    } else if (lastOperation === '÷') {
-      result = parseFloat(result) / parseFloat(dis2Num);
-    }
-  }
-  
-  
-  // 
-  equalEl.addEventListener('click', (e) => {
-    if (!dis1Num || !dis2Num) return;
-      haveDot = false;
-      mathOperation();
-      clearVar();
-    if (result == "Infinity" || result == "NaN") {
-      display2Element.value = 'Error'
-    } else {
-      display1Element.innerHTML += '='
-      display2Element.value = result;
-    }
-    dis2Num = result
-    dis1Num = ''
-  })
-  
-  //button %
-  pourcentage.addEventListener('click', (e) => {
-    display2Element.value = (display2Element.value) / 100
-  })
-  
-  
-  //button plusoumoins
-  plusoumoins.addEventListener('click', (e) => {
-    dis2Num = parseFloat(dis2Num) * -1
-    display2Element.value = dis2Num
-  })
-  
-  
-  // 
-  clearEl.addEventListener('click', (e) => {
-    display1Element.innerText = '';
-    display2Element.value = '';
-    dis2Num = '';
-    dis1Num = '';
-    result = '';
-  });
-  
-  //button delete all value in ibput and id calcul
-  clearLastEl.addEventListener('click', (e) => {
-    if (display2Element.value == '') {
-      return
-    } else {
-      display2Element.value = display2Element.value.slice(0,-1);
+function clickZero() {
+    const input = document.getElementById("input");
+    input.value += "0";
+}
 
+function myDigit(event) {
+    const digit = event.target.innerText;
+    const input = document.getElementById("input");
+    input.value += digit;
+}
+
+function toLabel(event) {
+    const operator = event.target.innerText;
+    const input = document.getElementById("input");
+    
+    // Vérifier si un opérateur existe déjà dans l'entrée utilisateur
+    if (!/[+\-*/]$/.test(input.value)) { 
+        // Ajouter seulement si aucun opérateur n'est déjà présent
+        input.value += ` ${operator} `;
     }
-  })
+}
+
+function clearInput() {
+    const input = document.getElementById("input");
+    input.value = "";
+}
+
+function reset() {
+    const input = document.getElementById("input");
+    const calculationParagraph = document.getElementById("calcul");
   
-  // input the value in the key
-  window.addEventListener('keydown', (e) => {
-    if (
-      e.key == '0' ||
-      e.key == '1' ||
-      e.key == '2' ||
-      e.key == '3' ||
-      e.key == '4' ||
-      e.key == '5' ||
-      e.key == '6' ||
-      e.key == '7' ||
-      e.key == '8' ||
-      e.key == '9' ||
-      e.key == '.'
-    ) {
-      clickButtonEl(e.key);
-    } else if (
-      e.key == '+' ||
-      e.key == '-' ||
-      e.key == '%'
-    ) {
-      clickOperation(e.key);
-    } else if (e.key == "*") {
-      clickOperation('x');
-    } else if (e.key == 'Enter' || e.key == "=") {
-      clickEqual();
+    input.value = "";
+    
+    // Remplacer le texte du paragraphe de calcul avec un texte vide
+    calculationParagraph.innerText = "";
+}
+
+function changeSign() {
+    const input = document.getElementById("input");
+    if (parseFloat(input.value) !==0) { 
+      // Vérifier que l'entrée n'est pas déjà zéro pour éviter les erreurs d'exécution.
+      input.value = parseFloat(input.value) * -1;
     }
-  });
-  
-  function clickButtonEl(key) {
-    numberEl.forEach(button => {
-      if (button.innerText === key) {
-        button.click();
-      }
-    })
-  }
-  
-  function clickOperation(key) {
-    operationEL.forEach(button => {
-      if (button.innerText === key) {
-        button.click();
-      }
-    })
-  }
-  
-  function clickEqual() {
-    equalEl.click();
-  }
-  
-  userInput.addEventListener("input", function () {
-    this.value = this.value.match(/[0-9.]*/)[0];
-  });
-  form.addEventListener("submit", function (event) {
-    event.preventDefault();
-  });
-  form.addEventListener("reset", function (event) {
-    event.preventDefault();
-  });
+}
