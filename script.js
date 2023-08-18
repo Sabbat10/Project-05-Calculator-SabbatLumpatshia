@@ -12,7 +12,7 @@ digitButtons.forEach((button) => {
 // Sélectionner tous les boutons d'opérateur et leur ajouter un écouteur d'événement
 const operatorButtons = document.querySelectorAll("#plus, #minus, #times, #divideby");
 operatorButtons.forEach((button) => {
-  button.addEventListener("click", toLabel);s
+  button.addEventListener("click", toLabel);
 });
 
 // Sélectionner le bouton "C" (clear) et lui ajouter un écouteur d'événement
