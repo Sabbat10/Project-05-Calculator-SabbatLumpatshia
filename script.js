@@ -1,73 +1,160 @@
-//import { calculate } from './calculator.js';
-
-// TODO: Faire la manipulation du DOM dans ce fich
-
-// seclect elements 
-// Sélectionner tous les boutons numériques et leur ajouter un écouteur d'événement
-const digitButtons = document.querySelectorAll(".numpad.digit");
-digitButtons.forEach((button) => {
-  button.addEventListener("click", myDigit);
-});
-
-// Sélectionner tous les boutons d'opérateur et leur ajouter un écouteur d'événement
-const operatorButtons = document.querySelectorAll("#plus, #minus, #times, #divideby");
-operatorButtons.forEach((button) => {
-  button.addEventListener("click", toLabel);
-});
-
-// Sélectionner le bouton "C" (clear) et lui ajouter un écouteur d'événement
+//sélection des élément
+const inputField = document.getElementById("input");
+const calculationLabel = document.getElementById("calcul");
 const clearButton = document.getElementById("clear");
-clearButton.addEventListener("click", clearInput);
-
-// Sélectionner le bouton "AC" (reset) et lui ajouter un écouteur d'événement
+const plusMinusButton = document.getElementById("plusoumoins");
+const percentageButton = document.getElementById("percentage");
+const divideButton = document.getElementById("divideby");
+const multiplyButton = document.getElementById("times");
+const minusButton = document.getElementById("minus");
+const plusButton = document.getElementById("plus");
+const equalsButton = document.getElementById("equals");
+const digitButtons = document.getElementsByClassName("digit");
+const dotButton = document.getElementsByClassName("dot");
 const resetButton = document.getElementById("reset");
-resetButton.addEventListener("click", reset);
 
-// Sélectionner le bouton "+/-" (changeSign) et lui ajouter un écouteur d'événement
-const plusoumoins = document.getElementById("plusoumoins");
-plusoumoins.addEventListener('click', changeSign);
+let isZeroRepeated = false; // Variable pour indiquer si le zéro est déjà répété
 
-function clickZero() {
-    const input = document.getElementById("input");
-    input.value += "0";
+// Ajout d'un écouteur d'événement pour chaque bouton de chiffre
+for (let i = 0; i < digitButtons.length; i++) {
+  digitButtons[i].addEventListener("click", function () {
+    addToInput(this.innerText);
+  });
 }
 
-function myDigit(event) {
-    const digit = event.target.innerText;
-    const input = document.getElementById("input");
-    input.value += digit;
+dotButton[0].addEventListener("click", function (event) {
+  addDotToInput();
+  event.preventDefault();
+});
+
+// Ajout d'un écouteur d'événement pour le bouton clear
+clearButton.addEventListener("click", function () {
+  clearInput();
+});
+
+plusMinusButton.addEventListener("click", function (event) {
+  changeSign();
+  event.preventDefault();
+});
+
+percentageButton.addEventListener("click", function (event) {
+  calculatePercentage();
+  event.preventDefault();
+});
+
+divideButton.addEventListener("click", function (event) {
+  addOperatorToInput("÷");
+  event.preventDefault();
+});
+
+multiplyButton.addEventListener("click", function (event) {
+  addOperatorToInput("×");
+  event.preventDefault();
+});
+
+minusButton.addEventListener("click", function (event) {
+  addOperatorToInput("-");
+  event.preventDefault();
+});
+
+plusButton.addEventListener("click", function (event) {
+  addOperatorToInput("+");
+  event.preventDefault();
+});
+
+// Ajout d'un écouteur d'événement pour le bouton equals
+equalsButton.addEventListener("click", function () {
+  performCalculation();
+  event.preventDefault();
+});
+
+// Ajout d'un écouteur d'événement pour le bouton reset
+resetButton.addEventListener("click", function () {
+  resetCalculator();
+  event.preventDefault();
+});
+
+// Fonction pour ajouter un chiffre à l'entrée
+function addToInput(digit) {
+  if (digit === "0" && inputField.value === "0") {
+    // Empêcher la répétition du zéro
+    isZeroRepeated = true;
+    return;
+  }
+
+  if (isZeroRepeated) {
+    inputField.value = inputField.value.slice(0, -1);
+    isZeroRepeated = false;
+  }
+
+  inputField.value += digit;
 }
 
-function toLabel(event) {
-    const operator = event.target.innerText;
-    const input = document.getElementById("input");
-    
-    // Vérifier si un opérateur existe déjà dans l'entrée utilisateur
-    if (!/[+\-*/]$/.test(input.value)) { 
-        // Ajouter seulement si aucun opérateur n'est déjà présent
-        input.value += ` ${operator} `;
-    }
-}
-
-function clearInput() {
-    const input = document.getElementById("input");
-    input.value = "";
-}
-
-function reset() {
-    const input = document.getElementById("input");
-    const calculationParagraph = document.getElementById("calcul");
+// Fonction pour ajouter un point à l'entrée
+function addDotToInput() {
+  if (inputField.value === "" || inputField.value.includes(".")) {
+    return;
+  }
   
-    input.value = "";
-    
-    // Remplacer le texte du paragraphe de calcul avec un texte vide
-    calculationParagraph.innerText = "";
+  inputField.value += ".";
+  isZeroRepeated = false;
 }
 
+// Fonction pour effacer l'entrée
+function clearInput() {
+  inputField.value = "";
+  isZeroRepeated = false;
+}
+
+// Fonction pour changer le signe de l'entrée
 function changeSign() {
-    const input = document.getElementById("input");
-    if (parseFloat(input.value) !==0) { 
-      // Vérifier que l'entrée n'est pas déjà zéro pour éviter les erreurs d'exécution.
-      input.value = parseFloat(input.value) * -1;
-    }
+  if (inputField.value === "") {
+    return;
+  }
+  
+  inputField.value = -parseFloat(inputField.value);
+  isZeroRepeated = false;
+}
+
+// Fonction pour calculer le pourcentage
+function calculatePercentage() {
+  if (inputField.value === "") {
+    return;
+  }
+  
+  inputField.value = parseFloat(inputField.value) / 100;
+  isZeroRepeated = false;
+}
+
+// Fonction pour ajouter un opérateur à l'entrée
+function addOperatorToInput(operator) {
+  if (inputField.value === "") {
+    return;
+  }
+  
+  inputField.value += ` ${operator} `;
+  isZeroRepeated = false;
+}
+
+// Fonction pour effectuer le calcul
+function performCalculation() {
+  if (inputField.value === "") {
+    return;
+  }
+
+  const result = evaluateExpression(inputField.value);
+  calculationLabel.innerText = inputField.value + " = " + result;
+  inputField.value = result;
+  isZeroRepeated = false;
+}
+
+function evaluateExpression(expression) {
+  const sanitizedExpression = expression.replace(/×/g, "*").replace(/÷/g, "/");
+  return eval(sanitizedExpression);
+}
+
+function resetCalculator() {
+  inputField.value = "";
+  calculationLabel.innerText = "";
+  isZeroRepeated = false;
 }
